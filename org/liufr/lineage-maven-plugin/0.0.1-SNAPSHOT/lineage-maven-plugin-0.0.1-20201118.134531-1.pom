@@ -1,0 +1,123 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.liufr</groupId>
+    <artifactId>lineage-maven-plugin</artifactId>
+    <packaging>maven-plugin</packaging>
+    <version>0.0.1-SNAPSHOT</version>
+    <name>lineage-maven-plugin Maven Mojo</name>
+    <description>
+        A dependency manager service ,can export maven dependency to off-the-shelf graph database (Neo4J).
+    </description>
+    <url>http://maven.apache.org</url>
+
+    <properties>
+        <github.global.server>github</github.global.server>
+    </properties>
+
+    <dependencies>
+        <!-- maven-plugin -->
+        <dependency>
+            <groupId>org.apache.maven</groupId>
+            <artifactId>maven-plugin-api</artifactId>
+            <version>3.6.3</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.maven.plugin-tools</groupId>
+            <artifactId>maven-plugin-annotations</artifactId>
+            <version>3.6.0</version>
+        </dependency>
+
+        <!-- application -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.11</version>
+        </dependency>
+        <dependency>
+            <groupId>org.neo4j.driver</groupId>
+            <artifactId>neo4j-java-driver</artifactId>
+            <version>4.2.0-alpha01</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>3.6.0</version>
+            </plugin>
+
+            <!--打包插件-->
+            <plugin>
+                <artifactId>maven-deploy-plugin</artifactId>
+                <version>2.8.2</version>
+                <configuration>
+                    <altDeploymentRepository>internal.repo::default::file://${project.build.directory}/mvn-repo
+                    </altDeploymentRepository>
+                </configuration>
+            </plugin>
+
+            <!--源码-->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <version>3.2.1</version>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar-no-fork</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!--github上传插件,用于修改后的发布,执行 mvn clean deploy 自动打包上传到github-->
+            <plugin>
+                <groupId>com.github.github</groupId>
+                <artifactId>site-maven-plugin</artifactId>
+                <version>0.12</version>
+                <configuration>
+                    <message>Creating site for ${project.artifactId} ${project.version}</message>
+                    <noJekyll>true</noJekyll>
+                    <!--本地jar地址, 对应上面的altDeploymentRepository-->
+                    <outputDirectory>${project.build.directory}/mvn-repo</outputDirectory>
+                    <!--分支-->
+                    <branch>refs/heads/master</branch>
+                    <merge>true</merge>
+
+                    <includes>
+                        <include>**/*</include>
+                    </includes>
+                    <!--对应github上创建的仓库名称 name-->
+                    <repositoryName>mvn-repo</repositoryName>
+                    <!--github登录账号 对应的密码存在maven的setting.xml文件中-->
+                    <!--由github组织拥有，则该值将是组织名称，如果由用户拥有，则该值将是用户名-->
+                    <repositoryOwner>liufarui</repositoryOwner>
+                </configuration>
+
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>site</goal>
+                        </goals>
+                        <phase>deploy</phase>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

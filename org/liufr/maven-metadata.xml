@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<metadata>
+  <plugins>
+    <plugin>
+      <name>lineage-maven-plugin Maven Mojo</name>
+      <prefix>lineage</prefix>
+      <artifactId>lineage-maven-plugin</artifactId>
+    </plugin>
+  </plugins>
+</metadata>
